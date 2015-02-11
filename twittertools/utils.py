@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import re
 import sys
 
+
 def dbm_iter(dbpath, raw=False):
     try:
         import gdbm
@@ -32,12 +33,12 @@ def dbm_iter(dbpath, raw=False):
                 break
             last_k = k
             try:
-                tweet = tweet_from_dbm(db[k])
-                if tweet:
+                item = dict_from_dbm(db[k])
+                if item:
                     if raw:
-                        yield tweet
+                        yield item
                     else:
-                        yield tweet['tweet_text']
+                        yield item.get('text')
                 k = db.nextkey(k)
             except KeyError as err:
                 k = db.nextkey(k)
@@ -47,14 +48,14 @@ def dbm_iter(dbpath, raw=False):
 
     raise StopIteration
 
-def tweet_from_dbm(dbm_tweet):
-    
+
+def dict_from_dbm(dbm_tweet):
     try:
-        tweet_values = re.split(unichr(0017), dbm_tweet.decode('utf-8'))
+        values = re.split(unichr(0017), dbm_tweet.decode('utf-8'))
         t = dict()
-        t['tweet_id'] = int(tweet_values[0])
-        t['tweet_hash'] = tweet_values[1]
-        t['tweet_text'] = tweet_values[2]
+        t['id'] = int(values[0])
+        t['hash'] = values[1]
+        t['text'] = values[2]
         return t
     except ValueError:
         return None
