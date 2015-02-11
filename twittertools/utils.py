@@ -2,8 +2,10 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import re
+import sys
 
-def dbm_iter(dbpath):
+def dbm_iter(dbpath, raw=False):
     try:
         import gdbm
     except ImportError:
@@ -19,7 +21,7 @@ def dbm_iter(dbpath):
     # ignore first key, which is metadata
     last_k = k
     k = db.nextkey(k)
-    kk = db.netkey(k)
+    kk = db.nextkey(k)
     if kk == k:
         print("recursion in dbm file %s" % dbpath, file=sys.stderr)
         raise StopIteration
@@ -30,9 +32,12 @@ def dbm_iter(dbpath):
                 break
             last_k = k
             try:
-                tweet = _tweet_from_dbm(db[k])
+                tweet = tweet_from_dbm(db[k])
                 if tweet:
-                    yield tweet['tweet_text']
+                    if raw:
+                        yield tweet
+                    else:
+                        yield tweet['tweet_text']
                 k = db.nextkey(k)
             except KeyError as err:
                 k = db.nextkey(k)
@@ -42,6 +47,17 @@ def dbm_iter(dbpath):
 
     raise StopIteration
 
+def tweet_from_dbm(dbm_tweet):
+    
+    try:
+        tweet_values = re.split(unichr(0017), dbm_tweet.decode('utf-8'))
+        t = dict()
+        t['tweet_id'] = int(tweet_values[0])
+        t['tweet_hash'] = tweet_values[1]
+        t['tweet_text'] = tweet_values[2]
+        return t
+    except ValueError:
+        return None
 
 def main():
 	pass
