@@ -4,7 +4,8 @@ from __future__ import unicode_literals
 
 import re
 import sys
-
+import requests
+import shutil
 
 def dbm_iter(dbpath, raw=False):
     try:
@@ -76,6 +77,13 @@ def prune_dict(indict, dict_template):
         else:
             outdict[key] = keep
     return outdict
+
+
+def save_image(url, path):
+    response = requests.get(url, stream=True)
+    response.raw.decode_content = True
+    with open(path, 'wb') as tmp:
+        shutil.copyfileobj(response.raw, tmp)
 
 
 def main():
