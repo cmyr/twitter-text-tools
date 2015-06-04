@@ -52,7 +52,7 @@ def dbm_iter(dbpath, raw=False):
 
 def dict_from_dbm(dbm_tweet):
     try:
-        values = re.split(unichr(0017), dbm_tweet.decode('utf-8'))
+        values = re.split(unichr(17), dbm_tweet.decode('utf-8'))
         t = dict()
         t['id'] = int(values[0])
         t['hash'] = values[1]
