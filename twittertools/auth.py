@@ -3,7 +3,10 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import os
-from twitter.oauth import OAuth
+try:
+    from twitter.oauth import OAuth
+except ImportError:
+    from twitter import OAuth
 
 def load_auth(path, raw=False):
     if not os.path.exists(path):
